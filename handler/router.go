@@ -13,6 +13,7 @@ func InitRouter() *mux.Router {
 
 	// uploadHandler will trigger only when POST request is sent to "/upload" url
 	router.Handle("/upload", http.HandlerFunc(uploadHandler)).Methods("POST")
+	router.Handle("/search", http.HandlerFunc(searchHandler)).Methods("GET")
 
 	return router
 }

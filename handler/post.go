@@ -1,4 +1,4 @@
-package handler
+package handler // Handler matches controller in OnlineOrder
 
 import (
 	// Go packages
@@ -8,6 +8,7 @@ import (
 
 	// our own package
 	"around/model"
+	"around/service"
 )
 
 /* process user uploads
@@ -43,4 +44,34 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Fprintf = don't print to console, print content to ResponseWriter w (response buffer that will stream the message data to the response body -> mechanism to catch any exceptions, such as message is to long resulting in the program to crash)
 	fmt.Fprintf(w, "Post received: %s\n", p.Message)
+}
+
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received one request for search")
+	w.Header().Set("Content-Type", "application/json")
+
+	user := r.URL.Query().Get("user")
+	keywords := r.URL.Query().Get("keywords")
+
+	var posts []model.Post
+	var err error
+	if user != "" {
+		posts, err = service.SearchPostsByUser(user)
+	} else {
+		posts, err = service.SearchPostsByKeywords(keywords)
+	}
+
+	if err != nil {
+		http.Error(w, "Failed to read post from backend", http.StatusInternalServerError)
+		fmt.Printf("Failed to read post from backend %v.\n", err)
+		return
+	}
+
+	js, err := json.Marshal(posts) // Convert Go data into JSON
+	if err != nil {
+		http.Error(w, "Failed to parse posts into JSON format", http.StatusInternalServerError)
+		fmt.Printf("Failed to parse posts into JSON format %v.\n", err)
+		return
+	}
+	w.Write(js)
 }
