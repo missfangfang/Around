@@ -11,6 +11,9 @@ import (
 
 func main() {
 	fmt.Println("started-service") // helps to debug
+
 	backend.InitElasticsearchBackend()
+	backend.InitGCSBackend()
+
 	log.Fatal(http.ListenAndServe(":8080", handler.InitRouter()))
 }

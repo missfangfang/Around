@@ -5,10 +5,28 @@ import (
 	"encoding/json" // for the encoding and decoding of JSON，equivalent to Jackson in OnlineOrder
 	"fmt"
 	"net/http"
+	"path/filepath"
 
-	// our own package
+	// Our own package
 	"around/model"
 	"around/service"
+
+	"github.com/pborman/uuid"
+)
+
+// Literal (hash) map for different media types
+var (
+	mediaTypes = map[string]string{
+		".jpeg": "image",
+		".jpg":  "image",
+		".gif":  "image",
+		".png":  "image",
+		".mov":  "video",
+		".mp4":  "video",
+		".avi":  "video",
+		".flv":  "video",
+		".wmv":  "video",
+	}
 )
 
 /* process user uploads
@@ -30,20 +48,55 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received one upload request") // helps with debugging
 
 	// read the Request Body to the "decoder" object
-	decoder := json.NewDecoder(r.Body)
+	// decoder := json.NewDecoder(r.Body)
 
 	// (equivalent to Post p = new Post() in Java) declare a Post object p and send it to the Decode method to make data (json format) into a Go object
-	var p model.Post
+	// var p model.Post
 
 	// use the json Decode method to convert the Request Body to a Post object
 	// &p because we need to make changes to the p object
 	// if decode fails and error is not nil -> panic (throw runtime exception) -> program crashes and restarts
-	if err := decoder.Decode(&p); err != nil {
-		panic(err)
-	}
+	// if err := decoder.Decode(&p); err != nil {
+	// 	panic(err)
+	// }
 
 	// Fprintf = don't print to console, print content to ResponseWriter w (response buffer that will stream the message data to the response body -> mechanism to catch any exceptions, such as message is to long resulting in the program to crash)
-	fmt.Fprintf(w, "Post received: %s\n", p.Message)
+	// fmt.Fprintf(w, "Post received: %s\n", p.Message)
+
+	/* When your program needs to support user file uploads, the HTTP request body can no longer be JSON-format (supports text strings only) */
+
+	p := model.Post{
+		Id:      uuid.New(),
+		User:    r.FormValue("user"),
+		Message: r.FormValue("message"),
+	}
+
+	// file = file content
+	// header = file's metadata, i.e., size
+	file, header, err := r.FormFile("media_file")
+	if err != nil {
+		http.Error(w, "Media file is not available", http.StatusBadRequest)
+		fmt.Printf("Media file is not available %v\n", err)
+		return
+	}
+
+	// Determine if it's an image or video
+	suffix := filepath.Ext(header.Filename) // Extract file name extension
+	// Determine if the extension is a mediaType in the hashmap
+	if t, ok := mediaTypes[suffix]; ok {
+		p.Type = t
+	} else {
+		p.Type = "unknown"
+	}
+
+	err = service.SavePost(&p, file)
+	if err != nil {
+		http.Error(w, "Failed to save post to backend", http.StatusInternalServerError)
+		fmt.Printf("Failed to save post to backend %v\n", err)
+		return
+	}
+
+	fmt.Println("Post is saved successfully.") // For debugging purposes
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {

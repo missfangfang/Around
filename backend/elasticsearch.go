@@ -9,7 +9,7 @@ import (
 	"github.com/olivere/elastic/v7"
 )
 
-/* Create an index and reading data in Elasticsearch: https://github.com/olivere/elastic/blob/release-branch.v7/example_test.go */
+/* Create an index, reading data, saving data in Elasticsearch: https://github.com/olivere/elastic/blob/release-branch.v7/example_test.go */
 
 /* ES mapping: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html */
 
@@ -105,4 +105,14 @@ func (backend *ElasticsearchBackend) ReadFromES(query elastic.Query, index strin
 	}
 
 	return searchResult, nil
+}
+
+// Save a post data to Elasticsearch
+func (backend *ElasticsearchBackend) SaveToES(i interface{}, index string, id string) error {
+	_, err := backend.client.Index().
+		Index(index).
+		Id(id).
+		BodyJson(i).
+		Do(context.Background())
+	return err
 }
