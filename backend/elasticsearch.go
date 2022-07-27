@@ -116,3 +116,14 @@ func (backend *ElasticsearchBackend) SaveToES(i interface{}, index string, id st
 		Do(context.Background())
 	return err
 }
+
+// Delete a post data from Elasticsearch
+func (backend *ElasticsearchBackend) DeleteFromES(query elastic.Query, index string) error {
+	_, err := backend.client.DeleteByQuery().
+		Index(index).
+		Query(query).
+		Pretty(true).
+		Do(context.Background())
+
+	return err
+}

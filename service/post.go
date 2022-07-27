@@ -58,3 +58,12 @@ func SavePost(post *model.Post, file multipart.File) error { // 2 inputs: post a
 	// SaveToES
 	return backend.ESBackend.SaveToES(post, constants.POST_INDEX, post.Id)
 }
+
+// Delete a post based on its ID and user
+func DeletePost(id string, user string) error {
+	query := elastic.NewBoolQuery()
+	query.Must(elastic.NewTermQuery("id", id))
+	query.Must(elastic.NewTermQuery("user", user))
+
+	return backend.ESBackend.DeleteFromES(query, constants.POST_INDEX)
+}

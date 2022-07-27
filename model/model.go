@@ -1,6 +1,5 @@
 package model
 
-// Postman test: Around Backend Upload with JSON
 type Post struct {
 	// capital 'Id' = public
 	// lowercase 'id' = private
@@ -10,4 +9,11 @@ type Post struct {
 	Message string `json:"message"`
 	Url     string `json:"url"`
 	Type    string `json:"type"`
+}
+
+type User struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Age      int64  `json:"age"`
+	Gender   string `json:"gender"`
 }
