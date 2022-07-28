@@ -15,7 +15,7 @@ import (
 	jwt "github.com/form3tech-oss/jwt-go" // Token creation
 )
 
-var mySigningKey = []byte("secret") // Content ("secret") does not matter in this case
+// var mySigningKey = []byte("secret") // Content ("secret") does not matter in this case
 
 // Handle sign in requests
 func signinHandler(w http.ResponseWriter, r *http.Request) {

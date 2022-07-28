@@ -1,0 +1,10 @@
+elasticsearch:
+  address: "http://10.138.0.2:9200"
+  username: "missfangfang"
+  password: "12345,Ssdlh"
+
+gcs:
+  bucket: "tiffany-around-bucket"
+
+token:
+  secret: "secret"

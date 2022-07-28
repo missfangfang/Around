@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"around/constants"
+	"around/util"
 
 	"github.com/olivere/elastic/v7"
 )
@@ -21,11 +22,12 @@ type ElasticsearchBackend struct { // DAO class
 	client *elastic.Client // * pointer, refer to ES library codebase
 }
 
-func InitElasticsearchBackend() {
+func InitElasticsearchBackend(config *util.ElasticsearchInfo) {
 	// 1. New a ElasticsearchBackend object, create a connection
 	client, err := elastic.NewClient(
-		elastic.SetURL(constants.ES_URL), // URL address that connects to DB
-		elastic.SetBasicAuth(constants.ES_USERNAME, constants.ES_PASSWORD))
+		// elastic.SetURL(constants.ES_URL), // URL address that connects to DB
+		elastic.SetURL(config.Address),
+		elastic.SetBasicAuth(config.Username, config.Password))
 	if err != nil {
 		panic(err)
 	}
