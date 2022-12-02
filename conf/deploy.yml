@@ -1,7 +1,7 @@
 elasticsearch:
   address: "http://10.138.0.2:9200"
-  username: "missfangfang"
-  password: "12345,Ssdlh"
+  username: "HIDE_USERNAME"
+  password: "HIDE_PASSWORD"
 
 gcs:
   bucket: "tiffany-around-bucket"
